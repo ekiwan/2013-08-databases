@@ -1,0 +1,35 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <title>Chat with JSON!</title>
+    <link rel="stylesheet" href="static/reset.css">
+    <link rel="stylesheet" href="static/styles.css">
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/jquery/2.0.3/jquery.min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/underscore.js/1.5.1/underscore-min.js"></script>
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.1.0/moment.min.js"></script>
+    <script src="static/setup.js"></script>
+    <script src="static/main.js"></script>
+  </head>
+  <body>
+    <div id="container">
+      <div id="topbar">
+        <form>
+          <label>username: </label>
+          <input id="userForm" type="text">
+          <label>say somethin': </label>
+          <input id="inputmessage" type="text">
+        </form>
+        <button id="chatbutton">chat</button>
+      </div>
+
+      <div id='roomContainer'>Room:</div>
+
+      <div id="main">
+        <h1>Chat with JSON!</h1>
+        <div id="username"></div>
+        <div id="messages"></div>
+      </div>
+      </div>
+  </body>
+</html>
