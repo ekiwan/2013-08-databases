@@ -9,15 +9,15 @@ describe("Persistent Node Chat Server", function() {
 
   beforeEach(function() {
     dbConnection = mysql.createConnection({
-    /* TODO: Fill this out with your mysql username */
-      user: "",
+    /*Fill this out with your mysql username */
+      user: "blakelie",
     /* and password. */
-      password: "",
+      password: "plantlife",
       database: "chat"
     });
     dbConnection.connect();
 
-    var tablename = ""; // TODO: fill this out
+    var tablename = ""; //fill this out
 
     /* Empty the db table before each test so that multiple tests
      * (or repeated runs of the tests) won't screw each other up: */
@@ -41,7 +41,7 @@ describe("Persistent Node Chat Server", function() {
 
               var queryString = "";
               var queryArgs = [];
-              /* TODO: Change the above queryString & queryArgs to match your schema design
+              /* Change the above queryString & queryArgs to match your schema design
                * The exact query string and query args to use
                * here depend on the schema you design, so I'll leave
                * them up to you. */
