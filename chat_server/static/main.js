@@ -7,14 +7,16 @@ $(document).ready(function() {
   $.ajax('http://127.0.0.1:8080/1/classes/messages', {
     contentType: 'application/json',
     success: function(data){
+      console.log(data);
       mostRecent = data.results[0].createdAt;
       _.each(data.results, function(userData) {
-        var username = userData.username || 'visitor';
-        var date = moment(userData.createdAt).fromNow();
-        var message = username + ': ' + userData.text + ', ' + date;
+        var msgData = JSON.parse(userData);
+        var username = msgData.username || 'visitor';
+        var date = moment(msgData.createdAt).fromNow();
+        var message = username + ': ' + msgData.body + ', ' + date;
 
-        if (userData.hasOwnProperty('roomname')) {
-          room[userData.roomname] = userData.roomname;
+        if (msgData.hasOwnProperty('roomname')) {
+          room[msgData.roomname] = msgData.roomname;
         }
 
         $('#messages').append($('<div class="messageContainer"/>').data('username', username).text(message));
@@ -32,6 +34,7 @@ $(document).ready(function() {
     user = $('#userForm').val();
     userMessage = $('#inputmessage').val();
     var data = messageData(user, userMessage);
+    console.log(data);
     postMessage(data);
   });
 

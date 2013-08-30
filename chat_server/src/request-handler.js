@@ -5,11 +5,13 @@ var fs = require('fs');
 var mysql = require('mysql');
 var db = require('./basic-server.js');
 
-var insertMessage = function(username, room, message, createdAt) {
+var insertData = function(username, room, message, createdAt) {
   console.log('were in insert messages');
   // db.connection.connect();
   db.connection.query("INSERT INTO messages SET username = ?, room = ?, body = ?, createdAt = ?",
    [username, room, message, createdAt]);
+  db.connection.query("INSERT IGNORE INTO users SET username = ?",
+    [username]);
 };
 
 var responseHeaders = {
@@ -41,10 +43,12 @@ var sendRemaining = function(path, response) {
   if (path.indexOf('.css') !== -1) {
     fs.readFile(__dirname + '/..' + path, function(err, data) {
       responseHeaders['Content-Type'] = 'text/css';
+      console.log("serving css");
       write(data, response, responseHeaders);
     });
   } else {
     fs.readFile(__dirname + '/..' + path, function(err, data) {
+      console.log('serving js');
       responseHeaders['Content-Type'] = 'text/javscript';
       write(data, response, responseHeaders);
     });
@@ -58,6 +62,7 @@ exports.requestRouter = function (request, response) {
     sendIndex(response);
 
   } else if (urlObj.path.indexOf('static') !== -1 ) {
+    console.log('in the static route');
     sendRemaining(urlObj.path, response);
 
   } else if (urlObj.path === '/1/classes/messages') {
@@ -90,7 +95,7 @@ exports.messageHandler = function(request, response) {
   request.on('data', function(data) {
     var messageData = JSON.parse(data.toString());
     console.log(messageData.message);
-    insertMessage(messageData.username, 'room1', messageData.message, new Date());
+    insertData(messageData.username, 'room1', messageData.text, new Date());
   });
 
   request.on('end', function() {
