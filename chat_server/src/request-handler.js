@@ -102,7 +102,13 @@ exports.sendMessageHandler = function(request, response) {
 
   responseHeaders['Content-Type'] = 'application/json';
   response.writeHead(200, responseHeaders);
-
-    response.write(JSON.stringify('hey'));
+  var resObj = { results:[] };
+  db.connection.query('SELECT * FROM messages', function(err, results, fields) {
+     console.log(results);
+    _(results).each(function(messageData) {
+      resObj.results.push(JSON.stringify(messageData));
+    });
+    response.write(JSON.stringify(resObj));
     response.end();
+  });
   };

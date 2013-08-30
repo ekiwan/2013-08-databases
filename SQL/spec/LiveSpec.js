@@ -26,7 +26,7 @@ describe("Persistent Node Chat Server", function() {
     dbConnection.end();
   });
 
-  it("Should insert posted messages to the DB", function(done) {
+  xit("Should insert posted messages to the DB", function(done) {
     // Post a message to the node chat server:
     request({method: "POST",
              url: "http://127.0.0.1:8080/1/classes/messages",
@@ -60,10 +60,10 @@ describe("Persistent Node Chat Server", function() {
             });
   });
 
-  xit("Should output all messages from the DB", function(done) {
+  it("Should output all messages from the DB", function(done) {
     // Let's insert a message into the db
-    var queryString = "";
-    var queryArgs = ["Javert", "Men like you can never change!"];
+    var queryArgs = ["Javert", 'lesMisLuvas', "Men like you can never change!", new Date()];
+    var queryString = "INSERT INTO messages SET username=?, room = ?, body = ?, createdAt = ?";
     /* The exact query string and query args to use
      * here depend on the schema you design, so I'll leave
      * them up to you. */
@@ -72,11 +72,14 @@ describe("Persistent Node Chat Server", function() {
       function(err, results, fields) {
         /* Now query the Node chat server and see if it returns
          * the message we just inserted: */
-        request("http://127.0.0.1:8080/classes/room1",
+        request("http://127.0.0.1:8080/1/classes/messages",
           function(error, response, body) {
             var messageLog = JSON.parse(body);
-            expect(messageLog[0].username).toEqual("Javert");
-            expect(messageLog[0].message).toEqual("Men like you can never change!");
+            console.log(messageLog);
+            var message = JSON.parse(messageLog.results[0]);
+            console.log(message);
+            expect(message.username).toEqual("Javert");
+            expect(message.body).toEqual("Men like you can never change!");
             done();
           });
       });
