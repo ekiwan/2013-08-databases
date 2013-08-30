@@ -10,14 +10,12 @@ describe("Persistent Node Chat Server", function() {
   beforeEach(function() {
     dbConnection = mysql.createConnection({
     /*Fill this out with your mysql username */
-      user: "blakelie",
-    /* and password. */
-      password: "plantlife",
+      user: "root",
       database: "chat"
     });
     dbConnection.connect();
 
-    var tablename = ""; //fill this out
+    var tablename = "messages"; //fill this out
 
     /* Empty the db table before each test so that multiple tests
      * (or repeated runs of the tests) won't screw each other up: */
@@ -31,27 +29,29 @@ describe("Persistent Node Chat Server", function() {
   it("Should insert posted messages to the DB", function(done) {
     // Post a message to the node chat server:
     request({method: "POST",
-             uri: "http://127.0.0.1:8080/classes/room1",
-             form: {username: "Valjean",
-                    message: "In mercy's name, three days is all I need."}
+             url: "http://127.0.0.1:8080/1/classes/messages",
+             json: {
+                username: "Valjean",
+                message: "In mercy's name, three days is all I need."
+             }
             },
             function(error, response, body) {
               /* Now if we look in the database, we should find the
                * posted message there. */
 
-              var queryString = "";
+              var queryString = "SELECT * from messages";
               var queryArgs = [];
               /* Change the above queryString & queryArgs to match your schema design
                * The exact query string and query args to use
                * here depend on the schema you design, so I'll leave
                * them up to you. */
-              dbConnection.query( queryString, queryArgs,
+              dbConnection.query( queryString,
                 function(err, results, fields) {
                   // Should have one result:
                   expect(results.length).toEqual(1);
                   expect(results[0].username).toEqual("Valjean");
-                  expect(results[0].message).toEqual("In mercy's name, three days is all I need.");
-                  /* TODO: You will need to change these tests if the
+                  expect(results[0].body).toEqual("In mercy's name, three days is all I need.");
+                  /* You will need to change these tests if the
                    * column names in your schema are different from
                    * mine! */
 
@@ -60,11 +60,11 @@ describe("Persistent Node Chat Server", function() {
             });
   });
 
-  it("Should output all messages from the DB", function(done) {
+  xit("Should output all messages from the DB", function(done) {
     // Let's insert a message into the db
     var queryString = "";
     var queryArgs = ["Javert", "Men like you can never change!"];
-    /* TODO - The exact query string and query args to use
+    /* The exact query string and query args to use
      * here depend on the schema you design, so I'll leave
      * them up to you. */
 

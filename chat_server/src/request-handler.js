@@ -2,9 +2,14 @@ var url = require('url');
 var http = require("http");
 var _ = require('underscore');
 var fs = require('fs');
+var mysql = require('mysql');
+var db = require('./basic-server.js');
 
-var insertMessage = function(username, createdAt, message) {
-
+var insertMessage = function(username, room, message, createdAt) {
+  console.log('were in insert messages');
+  // db.connection.connect();
+  db.connection.query("INSERT INTO messages SET username = ?, room = ?, body = ?, createdAt = ?",
+   [username, room, message, createdAt]);
 };
 
 var responseHeaders = {
@@ -22,7 +27,7 @@ var write = function(data, response, responseHeaders) {
 };
 
 var sendIndex = function(response) {
-  fs.readFile('index.html', function(err, data) {
+  fs.readFile('../index.html', function(err, data) {
     if (err) {
       throw new Error('oh nose! </3');
     }
@@ -56,13 +61,16 @@ exports.requestRouter = function (request, response) {
     sendRemaining(urlObj.path, response);
 
   } else if (urlObj.path === '/1/classes/messages') {
+    console.log('were at the path router');
 
     if (request.method === 'OPTIONS') {
+      console.log('were at the options check');
       response.writeHead(200, responseHeaders);
       response.end();
     }
 
     if (request.method === 'POST') {
+      console.log('were at the post request');
       exports.messageHandler(request, response);
     }
 
@@ -76,12 +84,13 @@ exports.requestRouter = function (request, response) {
 };
 
 exports.messageHandler = function(request, response) {
+  console.log('were in the message handler');
   response.writeHead(201, responseHeaders);
 
   request.on('data', function(data) {
     var messageData = JSON.parse(data.toString());
-    storage.results.push(messageData);
-    insertMessage(messageData.username, new Date(), messageData.text);
+    console.log(messageData.message);
+    insertMessage(messageData.username, 'room1', messageData.message, new Date());
   });
 
   request.on('end', function() {
@@ -94,6 +103,6 @@ exports.sendMessageHandler = function(request, response) {
   responseHeaders['Content-Type'] = 'application/json';
   response.writeHead(200, responseHeaders);
 
-    response.write(JSON.stringify(dbResponse));
+    response.write(JSON.stringify('hey'));
     response.end();
   };

@@ -2,6 +2,7 @@ CREATE DATABASE IF NOT EXISTS chat;
 
 use chat;
 
+
 CREATE TABLE users (
   username varchar(15),
   pass varchar(255),
@@ -15,9 +16,10 @@ CREATE TABLE messages (
  room varchar(25),
  body text,
  createdAt timestamp,
- PRIMARY KEY(M_id),
- FOREIGN KEY(username) references users(username)
+ PRIMARY KEY(M_id)
 ) ENGINE=Innodb;
+
+CREATE INDEX userIndex on messages(username);
 
 CREATE TABLE userfriends (
   F_id smallint auto_increment,

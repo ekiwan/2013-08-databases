@@ -13,16 +13,14 @@ var server = http.createServer(handler.requestRouter);
 console.log("Listening on http://" + ip + ":" + port);
 server.listen(port, ip);
 
-var dbConnection = mysql.createConnection({
+var connection = exports.connection = mysql.createConnection({
   user: "root",
   database: "chat"
 });
 
-dbConnection.connect();
+connection.connect();
 
-dbConnection.query("INSERT into USERS (username, pass) values ('LevarBurton', 'readingrainbow')");
-
-dbConnection.end();
+// connection.end();
 
 
 

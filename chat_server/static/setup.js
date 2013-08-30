@@ -1,15 +1,15 @@
-$(document).ready(function() {
-  if(!/(&|\?)username=/.test(window.location.search)){
-    var newSearch = window.location.search;
+// $(document).ready(function() {
+//   if(!/(&|\?)username=/.test(window.location.search)){
+//     var newSearch = window.location.search;
 
-    if(newSearch !== '' & newSearch !== '?'){
-      newSearch += '&';
-    }
+//     if(newSearch !== '' & newSearch !== '?'){
+//       newSearch += '&';
+//     }
 
-    newSearch += 'username=' + prompt('wat yo name?') || 'anonymous';
-    window.location.search = newSearch;
-  }
-});
+//     newSearch += 'username=' + prompt('wat yo name?') || 'anonymous';
+//     window.location.search = newSearch;
+//   }
+// });
 
 //   // Don't worry about this code, it will ensure that your ajax calls are allowed by the browser
 // $.ajaxPrefilter(function(settings, _, jqXHR) {
