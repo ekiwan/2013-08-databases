@@ -55,15 +55,22 @@ var sendRemaining = function(path, response) {
   }
 };
 
+var routes = [
+  [function(path){return path === '/';}, sendIndex(response)],
+  [function(path){return path.indexOf('static') !== -1;}, sendRemaining(urlObj.path, response)],
+  [function(path){return path === '/';}, sendIndex(response)],
+  [function(path){return path === '/';}, sendIndex(response)]
+];
+
 exports.requestRouter = function (request, response) {
   var urlObj = url.parse(request.url);
 
-  if (urlObj.path === '/') {
-    sendIndex(response);
+  // if (urlObj.path === '/') {
+  //   sendIndex(response);
 
-  } else if (urlObj.path.indexOf('static') !== -1 ) {
-    console.log('in the static route');
-    sendRemaining(urlObj.path, response);
+  // } else if (urlObj.path.indexOf('static') !== -1 ) {
+  //   console.log('in the static route');
+  //   sendRemaining(urlObj.path, response);
 
   } else if (urlObj.path === '/1/classes/messages') {
     console.log('were at the path router');
