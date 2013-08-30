@@ -14,12 +14,13 @@ console.log("Listening on http://" + ip + ":" + port);
 server.listen(port, ip);
 
 var dbConnection = mysql.createConnection({
-  user: "blakelie",
-  password: "plantlife",
+  user: "root",
   database: "chat"
 });
 
 dbConnection.connect();
+
+dbConnection.query("INSERT into USERS (username, pass) values ('LevarBurton', 'readingrainbow')");
 
 dbConnection.end();
 

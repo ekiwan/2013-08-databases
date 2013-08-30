@@ -2,8 +2,6 @@ var url = require('url');
 var http = require("http");
 var _ = require('underscore');
 var fs = require('fs');
-var moment = require('moment');
-
 
 var insertMessage = function(username, createdAt, message) {
 
