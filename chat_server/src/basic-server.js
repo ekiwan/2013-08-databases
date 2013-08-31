@@ -1,5 +1,5 @@
 /* Import node's http module: */
-var mysql = require("mysql");
+// var mysql = require("mysql");
 var http = require("http");
 var handler = require('./request-handler.js');
 var url = require('url');
@@ -13,12 +13,12 @@ var server = http.createServer(handler.requestRouter);
 console.log("Listening on http://" + ip + ":" + port);
 server.listen(port, ip);
 
-var connection = exports.connection = mysql.createConnection({
-  user: "root",
-  database: "chat"
-});
+// var connection = exports.connection = mysql.createConnection({
+//   user: "root",
+//   database: "chat"
+// });
 
-connection.connect();
+// connection.connect();
 
 // connection.end();
 

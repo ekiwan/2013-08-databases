@@ -2,19 +2,11 @@ var url = require('url');
 var http = require("http");
 var _ = require('underscore');
 var fs = require('fs');
-var mysql = require('mysql');
+//var mysql = require('mysql');
 var db = require('./basic-server.js');
+var dbFunc = require('../../ORM_Refactor/orm_refactor.js');
 
-var insertData = function(username, room, message, createdAt) {
-  console.log('were in insert messages');
-  // db.connection.connect();
-  db.connection.query("INSERT INTO messages SET username = ?, room = ?, body = ?, createdAt = ?",
-   [username, room, message, createdAt]);
-  db.connection.query("INSERT IGNORE INTO users SET username = ?",
-    [username]);
-};
-
-var responseHeaders = {
+var responseHeaders = exports.responseHeaders = {
     "access-control-allow-origin": "*",
     "access-control-allow-methods": "GET, POST, PUT, DELETE, OPTIONS",
     "access-control-allow-headers": "content-type, accept",
@@ -34,7 +26,7 @@ exports.messageHandler = function(request, response) {
 
   request.on('data', function(data) {
     var messageData = JSON.parse(data.toString());
-    insertData(messageData.username, 'room1', messageData.text, new Date());
+    dbFunc.insertData(messageData.username, 'room1', messageData.text);
   });
 
   request.on('end', function() {
@@ -71,45 +63,18 @@ exports.optionsResponse = function(request, response, path) {
   response.writehead(200, headers);
 };
 
-exports.sendMessageHandler = function(request, response) {
 
-  responseHeaders['Content-Type'] = 'application/json';
-  response.writeHead(200, responseHeaders);
-  var resObj = { results:[] };
-  db.connection.query('SELECT * FROM messages', function(err, results, fields) {
-    _(results).each(function(messageData) {
-      resObj.results.push(JSON.stringify(messageData));
-    });
-    response.write(JSON.stringify(resObj));
-    response.end();
-  });
-  };
 
-exports.addFriend = function(request, response) {
-  username1 = 'blakelie';
-  var username5;
-  response.writeHead(201, responseHeaders);
-  request.on('data', function(data) {
-    dataObj = JSON.parse(data.toString());
-    username5 = dataObj.name;
-    console.log(username5);
-  });
-  request.on('end', function(err, data) {
-    db.connection.query("INSERT INTO userfriends SET username1 = ?, username2 = ?",
-      [username1, username5]);
-    response.end();
-  });
-};
 
 var routes = {
   GET: [
     [function(path){return path === '/';}, sendIndex],
     [function(path){return path.indexOf('static') !== -1;}, sendRemaining],
-    [function(path){return path === '/1/classes/messages';}, exports.sendMessageHandler]
+    [function(path){return path === '/1/classes/messages';}, dbFunc.sendMessageHandler]
   ],
   POST: [
     [function(path){return path === '/1/classes/messages';}, exports.messageHandler],
-    [function(path){return path === '/1/friends';}, exports.addFriend]
+    [function(path){return path === '/1/friends';}, dbFunc.addFriend]
   ],
   OPTIONS: [
     [function(path){return path === '/1/classes/messages';}, exports.optionsResponse]
