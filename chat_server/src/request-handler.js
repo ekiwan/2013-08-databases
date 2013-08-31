@@ -28,73 +28,6 @@ var write = function(data, response, responseHeaders) {
   response.end();
 };
 
-var sendIndex = function(response) {
-  fs.readFile('../index.html', function(err, data) {
-    if (err) {
-      throw new Error('oh nose! </3');
-    }
-
-    responseHeaders['Content-Type'] = 'text/html';
-    write(data, response, responseHeaders);
-  });
-};
-
-var sendRemaining = function(path, response) {
-  if (path.indexOf('.css') !== -1) {
-    fs.readFile(__dirname + '/..' + path, function(err, data) {
-      responseHeaders['Content-Type'] = 'text/css';
-      console.log("serving css");
-      write(data, response, responseHeaders);
-    });
-  } else {
-    fs.readFile(__dirname + '/..' + path, function(err, data) {
-      console.log('serving js');
-      responseHeaders['Content-Type'] = 'text/javscript';
-      write(data, response, responseHeaders);
-    });
-  }
-};
-
-var routes = [
-  [function(path){return path === '/';}, sendIndex(response)],
-  [function(path){return path.indexOf('static') !== -1;}, sendRemaining(urlObj.path, response)],
-  [function(path){return path === '/';}, sendIndex(response)],
-  [function(path){return path === '/';}, sendIndex(response)]
-];
-
-exports.requestRouter = function (request, response) {
-  var urlObj = url.parse(request.url);
-
-  // if (urlObj.path === '/') {
-  //   sendIndex(response);
-
-  // } else if (urlObj.path.indexOf('static') !== -1 ) {
-  //   console.log('in the static route');
-  //   sendRemaining(urlObj.path, response);
-
-  } else if (urlObj.path === '/1/classes/messages') {
-    console.log('were at the path router');
-
-    if (request.method === 'OPTIONS') {
-      console.log('were at the options check');
-      response.writeHead(200, responseHeaders);
-      response.end();
-    }
-
-    if (request.method === 'POST') {
-      console.log('were at the post request');
-      exports.messageHandler(request, response);
-    }
-
-    if (request.method === 'GET') {
-      exports.sendMessageHandler(request, response);
-    }
-  } else {
-    response.writeHead(404);
-    response.end();
-  }
-};
-
 exports.messageHandler = function(request, response) {
   console.log('were in the message handler');
   response.writeHead(201, responseHeaders);
@@ -108,6 +41,35 @@ exports.messageHandler = function(request, response) {
   request.on('end', function() {
     response.end();
   });
+};
+
+var sendIndex = function(request, response, path) {
+  fs.readFile('../index.html', function(err, data) {
+    if (err) {
+      throw new Error('oh nose! </3');
+    }
+
+    responseHeaders['Content-Type'] = 'text/html';
+    write(data, response, responseHeaders);
+  });
+};
+
+var sendRemaining = function(request, response, path) {
+  if (path.indexOf('.css') !== -1) {
+    fs.readFile(__dirname + '/..' + path, function(err, data) {
+      responseHeaders['Content-Type'] = 'text/css';
+      write(data, response, responseHeaders);
+    });
+  } else {
+    fs.readFile(__dirname + '/..' + path, function(err, data) {
+      responseHeaders['Content-Type'] = 'text/javscript';
+      write(data, response, responseHeaders);
+    });
+  }
+};
+
+exports.optionsResponse = function(request, response, path) {
+  response.writehead(200, headers);
 };
 
 exports.sendMessageHandler = function(request, response) {
@@ -124,3 +86,45 @@ exports.sendMessageHandler = function(request, response) {
     response.end();
   });
   };
+
+var routes = {
+  GET: [
+    [function(path){return path === '/';}, sendIndex],
+    [function(path){return path.indexOf('static') !== -1;}, sendRemaining],
+    [function(path){return path === '/1/classes/messages';}, exports.sendMessageHandler]
+  ],
+  POST: [
+    [function(path){return path === '/1/classes/messages';}, exports.messageHandler]
+  ],
+  OPTIONS: [
+    [function(path){return path === '/1/classes/messages';}, exports.optionsResponse]
+  ]
+};
+
+exports.requestRouter = function (request, response) {
+  var urlObj = url.parse(request.url);
+  switch (request.method) {
+    case 'GET':
+      _.each(routes.GET, function(pair) {
+        if (pair[0](urlObj.path)) {pair[1](request, response, urlObj.path);}
+      });
+      break;
+    case 'POST':
+      _.each(routes.POST, function(pair) {
+        if (pair[0](urlObj.path)) {pair[1](request, response);}
+      });
+      break;
+    case 'OPTIONS':
+      _.each(routes.OPTIONS, function(pair) {
+        if (pair[0](urlObj.path)) {pair[1](request, response);}
+      });
+      break;
+    default:
+      response.writeHead(404);
+      response.end();
+  }
+
+};
+
+
+
