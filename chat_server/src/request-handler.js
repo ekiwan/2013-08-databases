@@ -34,7 +34,6 @@ exports.messageHandler = function(request, response) {
 
   request.on('data', function(data) {
     var messageData = JSON.parse(data.toString());
-    console.log(messageData.message);
     insertData(messageData.username, 'room1', messageData.text, new Date());
   });
 
@@ -78,7 +77,6 @@ exports.sendMessageHandler = function(request, response) {
   response.writeHead(200, responseHeaders);
   var resObj = { results:[] };
   db.connection.query('SELECT * FROM messages', function(err, results, fields) {
-     console.log(results);
     _(results).each(function(messageData) {
       resObj.results.push(JSON.stringify(messageData));
     });
@@ -87,6 +85,22 @@ exports.sendMessageHandler = function(request, response) {
   });
   };
 
+exports.addFriend = function(request, response) {
+  username1 = 'blakelie';
+  var username5;
+  response.writeHead(201, responseHeaders);
+  request.on('data', function(data) {
+    dataObj = JSON.parse(data.toString());
+    username5 = dataObj.name;
+    console.log(username5);
+  });
+  request.on('end', function(err, data) {
+    db.connection.query("INSERT INTO userfriends SET username1 = ?, username2 = ?",
+      [username1, username5]);
+    response.end();
+  });
+};
+
 var routes = {
   GET: [
     [function(path){return path === '/';}, sendIndex],
@@ -94,12 +108,14 @@ var routes = {
     [function(path){return path === '/1/classes/messages';}, exports.sendMessageHandler]
   ],
   POST: [
-    [function(path){return path === '/1/classes/messages';}, exports.messageHandler]
+    [function(path){return path === '/1/classes/messages';}, exports.messageHandler],
+    [function(path){return path === '/1/friends';}, exports.addFriend]
   ],
   OPTIONS: [
     [function(path){return path === '/1/classes/messages';}, exports.optionsResponse]
   ]
 };
+
 
 exports.requestRouter = function (request, response) {
   var urlObj = url.parse(request.url);

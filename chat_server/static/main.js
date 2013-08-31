@@ -13,13 +13,18 @@ $(document).ready(function() {
         var msgData = JSON.parse(userData);
         var username = msgData.username || 'visitor';
         var date = moment(msgData.createdAt).fromNow();
-        var message = username + ': ' + msgData.body + ', ' + date;
+        var message = msgData.body;
 
         if (msgData.hasOwnProperty('roomname')) {
           room[msgData.roomname] = msgData.roomname;
         }
 
-        $('#messages').append($('<div class="messageContainer"/>').data('username', username).text(message));
+        var mainMsgDiv = $('<div></div>').attr('class', 'message');
+        var usernameDiv = $('<div></div>').attr('class', 'username').text(username).appendTo(mainMsgDiv);
+        var createdAtDiv = $('<div></div>').attr('class', 'createdAt').text(date).appendTo(mainMsgDiv);
+        var messageDiv = $('<div></div>').attr('class', 'mainText').text(message).appendTo(mainMsgDiv);
+
+        $('#messages').append(mainMsgDiv);
       });
       setUpFriends();
       showRooms();
@@ -64,13 +69,21 @@ $(document).ready(function() {
     });
   };
 
-  var selectFriends = function() {
-    $.each($('.messageContainer'), function(index, el) {
-      if (friends[$(el).data().username]) {
-        $(this).wrap('<strong/>');
-      }
-    });
-  };
+
+  $("body").on("click", ".username", function() {
+      var username = $(this).text();
+      $.ajax('http://127.0.0.1:8080/1/friends', {
+        contentType: 'application/json',
+        type: 'POST',
+        data: JSON.stringify({
+          name: username
+        }),
+        success: function(){
+          console.log('we are friends');
+        }
+      });
+  });
+
 
   var showRooms = function() {
     _.each(room, function(val, key) {
@@ -86,7 +99,7 @@ $(document).ready(function() {
       _.each(data.results, function(userData) {
         var username = userData.username || 'visitor';
         var date = moment(userData.createdAt).fromNow();
-        var message = username + ': ' + userData.text + ', ' + date;
+        var message = '<span class =' + username + '>' + username + '</span>:'   + userData.text + ', ' + date;
 
         if (userData.hasOwnProperty('roomname')) {
           if (userData['roomname'] === roomname) {
